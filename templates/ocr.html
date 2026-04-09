@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Assist | OCR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --accent: #3b82f6;
+            --bg: #030712;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #34d399 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        input[type="file"]:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: 1rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.4);
+        }
+
+        #result-container {
+            margin-top: 2rem;
+            display: none;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid var(--glass-border);
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: #e5e7eb;
+            font-size: 1.05rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--primary);
+            font-weight: 500;
+            display: none;
+            margin: 1.5rem 0;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 2.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>OCR Detection</h1>
+            <p class="subtitle">Extract text from handwritten sheets instantly.</p>
+
+            <form id="ocrForm">
+                <div class="form-group">
+                    <label for="file">Target Images (Multiple allowed)</label>
+                    <input type="file" id="file" name="files" accept="image/*" multiple required>
+                </div>
+                <button type="submit" id="submitBtn">Extract Text</button>
+            </form>
+
+            <div id="loading" class="loading">AI is analyzing handwriting...</div>
+
+            <div id="result-container">
+                <label>Detected Text</label>
+                <div class="result-box" id="resultText"></div>
+            </div>
+
+            <div class="nav-links" style="margin-top: 2.5rem; display: flex; justify-content: center; gap: 1.5rem;">
+                <a href="/"
+                    style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;">Home</a>
+                <a href="/query"
+                    style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;">Query</a>
+                <a href="/evaluate"
+                    style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;">Evaluate</a>
+                <a href="/assignment"
+                    style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500;">Assignment</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('ocrForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const fileInput = document.getElementById("file");
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append("files", fileInput.files[i]);
+            }
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const resultContainer = document.getElementById('result-container');
+            const resultText = document.getElementById('resultText');
+
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            resultContainer.style.display = 'none';
+
+            try {
+                const response = await fetch('/ocr_detect', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                resultText.textContent = result.extracted_text;
+                loading.style.display = 'none';
+                resultContainer.style.display = 'block';
+                submitBtn.disabled = false;
+            } catch (error) {
+                console.error('Error:', error);
+                loading.textContent = 'Error processing image.';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

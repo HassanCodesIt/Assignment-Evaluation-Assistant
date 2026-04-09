@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Assist | Create Assignment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --accent: #c084fc;
+            --bg: #030712;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --success: #4ade80;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.15) 0px, transparent 50%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            font-size: 1.1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 600px) {
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select,
+        input[type="text"],
+        input[type="date"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input[type="file"] {
+            padding: 0.6rem;
+            cursor: pointer;
+        }
+
+        select:focus,
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        input[type="checkbox"] {
+            width: 1.25rem;
+            height: 1.25rem;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-label {
+            color: var(--text);
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-transform: none;
+            margin-bottom: 0;
+        }
+
+        .question-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .remove-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .add-question-btn {
+            background: rgba(129, 140, 248, 0.1);
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: all 0.2s;
+        }
+
+        .add-question-btn:hover {
+            background: rgba(129, 140, 248, 0.2);
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button.submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        button.submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .nav-links {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: var(--primary);
+        }
+
+        #message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            display: none;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.4s ease-out;
+            text-align: center;
+        }
+
+        .success {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Assignment</h1>
+            <p class="subtitle">Create and assign assignments to students.</p>
+
+            <form id="assignmentForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="academic_year">Academic Year</label>
+                        <input type="text" id="academic_year" name="academic_year" placeholder="e.g. 2023-24" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="class_section">Class - Section</label>
+                        <input type="text" id="class_section" name="class_section" placeholder="e.g. 10-A" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" placeholder="e.g. Physics" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="assignment_title">Assignment Title</label>
+                        <input type="text" id="assignment_title" name="assignment_title"
+                            placeholder="e.g. Gravity Basics" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Chapters</label>
+                        <div id="chaptersContainer">
+                            <div class="page-upload-item"
+                                style="margin-bottom: 0.5rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 0.5rem 1rem;">
+                                <input type="text" name="chapter" placeholder="e.g. Chapter 4" required
+                                    style="border: none; background: transparent; padding: 0.3rem;">
+                                <button type="button" class="remove-page" onclick="this.parentElement.remove()"
+                                    style="margin-left: auto;">×</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-page-btn" onclick="addChapter()"
+                            style="padding: 0.5rem; font-size: 0.8rem; margin-top: 0.5rem;">+ Add Chapter</button>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Topics</label>
+                        <div id="topicsContainer">
+                            <div class="page-upload-item"
+                                style="margin-bottom: 0.5rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 0.5rem 1rem;">
+                                <input type="text" name="assignment_topic" placeholder="e.g. Newton's Laws" required
+                                    style="border: none; background: transparent; padding: 0.3rem;">
+                                <button type="button" class="remove-page" onclick="this.parentElement.remove()"
+                                    style="margin-left: auto;">×</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-page-btn" onclick="addTopic()"
+                            style="padding: 0.5rem; font-size: 0.8rem; margin-top: 0.5rem;">+ Add Topic</button>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="textbook_reference">Textbook Reference(s) (PDF)</label>
+                        <input type="file" id="textbook_reference" name="textbook_reference" accept=".pdf" multiple
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="total_marks">Total Marks for Assignment</label>
+                        <input type="number" id="total_marks" name="total_marks" placeholder="e.g. 20" required
+                            style="width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.3); color: var(--text);">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Assignment Descriptions (Questions)</label>
+                        <div id="questionsContainer">
+                            <div class="question-item">
+                                <div class="question-header">
+                                    <label>Description 1</label>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group full-width" style="margin-bottom: 0;">
+                                        <textarea name="questions" placeholder="Enter description/question text..."
+                                            required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="add-question-btn" onclick="addQuestion()">+ Add Another
+                            Description</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="submission_date">Date of Submission</label>
+                        <input type="date" id="submission_date" name="submission_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="is_active" name="is_active" checked>
+                            <label for="is_active" class="checkbox-label">Assignment Active</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="btnText">Save Assignment</span>
+                </button>
+            </form>
+
+            <div id="message"></div>
+
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/query">Query</a>
+                <a href="/evaluate">Evaluate</a>
+                <a href="/ocr">OCR</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questionCount = 1;
+
+        function addChapter() {
+            const container = document.getElementById('chaptersContainer');
+            const div = document.createElement('div');
+            div.className = 'page-upload-item';
+            div.style.marginBottom = '0.5rem';
+            div.style.background = 'rgba(0,0,0,0.3)';
+            div.style.border = '1px solid var(--glass-border)';
+            div.style.padding = '0.5rem 1rem';
+            div.innerHTML = `
+                <input type="text" name="chapter" placeholder="e.g. Chapter 5" required style="border: none; background: transparent; padding: 0.3rem; width: 100%; color: white; outline: none;">
+                <button type="button" class="remove-page" onclick="this.parentElement.remove()" style="margin-left: auto;">×</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addTopic() {
+            const container = document.getElementById('topicsContainer');
+            const div = document.createElement('div');
+            div.className = 'page-upload-item';
+            div.style.marginBottom = '0.5rem';
+            div.style.background = 'rgba(0,0,0,0.3)';
+            div.style.border = '1px solid var(--glass-border)';
+            div.style.padding = '0.5rem 1rem';
+            div.innerHTML = `
+                <input type="text" name="assignment_topic" placeholder="e.g. Friction" required style="border: none; background: transparent; padding: 0.3rem; width: 100%; color: white; outline: none;">
+                <button type="button" class="remove-page" onclick="this.parentElement.remove()" style="margin-left: auto;">×</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addQuestion() {
+            questionCount++;
+            const container = document.getElementById('questionsContainer');
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-item';
+            questionDiv.innerHTML = `
+                <div class="question-header">
+                    <label>Description ${questionCount}</label>
+                    <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">Remove</button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width" style="margin-bottom: 0;">
+                        <textarea name="questions" placeholder="Enter description/question text..." required></textarea>
+                    </div>
+                </div>
+            `;
+            container.appendChild(questionDiv);
+        }
+
+        document.getElementById('assignmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const messageDiv = document.getElementById('message');
+
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Saving...';
+            messageDiv.style.display = 'none';
+
+            const formData = new FormData(e.target);
+
+            try {
+                const response = await fetch('/create_assignment', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    messageDiv.className = 'success';
+                    messageDiv.innerHTML = 'Assignment created successfully! <a href="/evaluate" style="color: var(--primary); text-decoration: underline; margin-left: 10px;">Go to Evaluate →</a>';
+                    messageDiv.style.display = 'block';
+                } else {
+                    let errorMsg = result.detail;
+                    if (typeof errorMsg === 'object') {
+                        errorMsg = JSON.stringify(errorMsg);
+                    }
+                    throw new Error(errorMsg || 'Failed to save assignment');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.className = '';
+                messageDiv.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                messageDiv.style.color = '#f87171';
+                messageDiv.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                messageDiv.textContent = error.message;
+                messageDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Save Assignment';
+            }
+        });
+    </script>
+</body>
+
+</html>

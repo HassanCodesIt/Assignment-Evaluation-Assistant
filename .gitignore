@@ -1,0 +1,17 @@
+# Virtual environment
+.venv/
+
+# Python bytecode
+__pycache__/
+
+# Environment variables (API keys)
+.env
+
+# Runtime data
+savepdf/
+vector_db/
+assignments.json
+static/
+
+# Unused files
+NOT USED/

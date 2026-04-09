@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Assist | Evaluate</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --accent: #c084fc;
+            --bg: #030712;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(129, 140, 248, 0.3);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(129, 140, 248, 0.5);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.12) 0px, transparent 50%);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        @media (min-width: 1100px) {
+            .container {
+                grid-template-columns: 420px 1fr;
+            }
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            position: sticky;
+            top: 40px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        select,
+        textarea,
+        input[type="text"],
+        input[type="date"],
+        input[type="file"] {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        select:focus,
+        textarea:focus,
+        input[type="text"]:focus,
+        input[type="date"]:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: 1rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -5px rgba(99, 102, 241, 0.5);
+            filter: brightness(1.1);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #assignment_inputs {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px dashed var(--glass-border);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        #assignment_inputs .form-group {
+            margin-bottom: 0;
+        }
+
+        #assignment_inputs label {
+            font-size: 0.7rem;
+            margin-bottom: 0.4rem;
+        }
+
+        #assignment_inputs input {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .result-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1.5rem;
+            padding: 1.25rem 1.5rem;
+            border: 1px solid var(--glass-border);
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .content-box {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #d1d5db;
+            white-space: pre-wrap;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: var(--primary);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .analysis-grid {
+                grid-template-columns: 320px 1fr;
+            }
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid rgba(129, 140, 248, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s infinite linear;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .page-upload-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .page-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            min-width: 60px;
+        }
+
+        .remove-page {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .remove-page:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: scale(1.1);
+        }
+
+        .add-page-btn {
+            background: rgba(129, 140, 248, 0.1);
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .add-page-btn:hover {
+            background: rgba(129, 140, 248, 0.2);
+            border-style: solid;
+        }
+
+        /* Multi-question styles */
+        .question-list-container {
+            margin-bottom: 2rem;
+        }
+
+        .question-badge-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 0.8rem 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-badge-item span {
+            color: var(--text-muted);
+        }
+
+        .question-badge-item b {
+            color: var(--primary);
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .summary-table th {
+            background: rgba(129, 140, 248, 0.1);
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .feedback-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+        }
+
+        .feedback-q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .feedback-q-title {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .feedback-q-score {
+            font-weight: 800;
+            background: rgba(129, 140, 248, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Input Panel -->
+        <div class="card">
+            <h1>Evaluate</h1>
+            <p class="subtitle">AI-powered answer sheet grading.</p>
+            <form id="evaluateForm">
+                <div class="form-group"
+                    style="padding-bottom: 0.5rem; border-bottom: 1px solid var(--glass-border); margin-bottom: 1.5rem;">
+                    <label style="color: var(--primary);">Load Saved Assignment</label>
+                    <div style="margin-bottom: 1.5rem;">
+                        <select id="saved_assignment" onchange="onAssignmentSelect()">
+                            <option value="">-- Select Assignment --</option>
+                        </select>
+                    </div>
+
+                    <div id="questions_preview" class="question-list-container">
+                        <!-- Questions will appear here after loading -->
+                    </div>
+
+                    <div id="assignment_inputs">
+                        <div class="form-group">
+                            <label>Academic Year</label>
+                            <input type="text" id="academic_year" name="academic_year" placeholder="e.g. 2023-24">
+                        </div>
+                        <div class="form-group">
+                            <label>Class - Section</label>
+                            <input type="text" id="class_section" name="class_section" placeholder="e.g. 10-A">
+                        </div>
+                        <div class="form-group">
+                            <label>Subject / Collection</label>
+                            <input type="text" id="subject" name="subject" placeholder="e.g. Physics" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Assignment Title</label>
+                            <input type="text" id="assignment_title" name="assignment_title" placeholder="e.g. Gravity">
+                        </div>
+                        <div class="form-group">
+                            <label>Chapter</label>
+                            <input type="text" id="chapter" name="chapter" placeholder="e.g. Chapter 4">
+                        </div>
+                        <div class="form-group">
+                            <label>Topic</label>
+                            <input type="text" id="assignment_topic" name="assignment_topic"
+                                placeholder="e.g. Newton's Laws">
+                        </div>
+                        <div class="form-group">
+                            <label>Submission Date</label>
+                            <input type="date" id="submission_date" name="submission_date">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <div class="checkbox-group"
+                                style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--glass-border); margin-top: 1rem;">
+                                <input type="checkbox" id="is_active" name="is_active" disabled
+                                    style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary);">
+                                <label for="is_active"
+                                    style="margin-bottom: 0; color: var(--text-muted); font-size: 0.9rem;">Assignment
+                                    Active</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="manual_question_group">
+                    <label for="question_text">Description (Manual)</label>
+                    <textarea id="question_text" name="question_text"
+                        placeholder="Or enter a manual description..."></textarea>
+                    <div style="margin-top: 1rem;">
+                        <label for="manual_total_marks">Total Marks (Manual)</label>
+                        <input type="number" id="manual_total_marks" value="10"
+                            style="width: 100%; padding: 0.85rem 1rem; border-radius: 0.75rem; border: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.3); color: var(--text);">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="instructions">Grading Instructions</label>
+                    <textarea id="instructions" name="instructions"
+                        placeholder="e.g. Focus on technical accuracy..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Answer sheet images</label>
+                    <p style="font-size: 0.75rem; color: var(--primary); margin-bottom: 0.75rem; opacity: 0.8;">
+                        💡 <b>Important:</b> Upload images in the correct sequence (Page 1, then Page 2, etc.) to ensure
+                        continuity.
+                    </p>
+                    <div id="pagesContainer">
+                        <div class="page-upload-item">
+                            <span class="page-number">Page 1</span>
+                            <input type="file" name="files" accept="image/*" required>
+                            <button type="button" class="remove-page" onclick="removePage(this)"
+                                style="visibility: hidden;">×</button>
+                        </div>
+                    </div>
+                    <button type="button" id="addPageBtn" class="add-page-btn" onclick="addPage()">+ Add Next
+                        Page</button>
+                </div>
+                <button type="submit" id="submitBtn">Analyze Answer</button>
+            </form>
+
+            <div id="loading">
+                <div class="spinner"></div>
+                <div>Processing Submission...</div>
+            </div>
+
+            <div class="nav-links">
+                <a href="/">HOME</a>
+                <a href="/query">Query</a>
+                <a href="/ocr">OCR</a>
+                <a href="/assignment">Assignment</a>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="result-container" id="resultArea" style="display: none;">
+            <!-- Score & OCR -->
+            <div class="analysis-grid">
+                <div class="result-section">
+                    <div class="section-header">
+                        <div class="section-dot"></div>
+                        <span class="section-title">Score</span>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="scoreChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <div class="section-header">
+                        <div class="section-dot"></div>
+                        <span class="section-title">Recognized Text</span>
+                    </div>
+                    <div class="content-box" id="extractedText" style="height: 220px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <!-- Detailed Evaluation -->
+            <div class="result-section">
+                <div class="section-header">
+                    <div class="section-dot"></div>
+                    <span class="section-title">AI Feedback & Grading</span>
+                </div>
+                <div class="content-box" id="evaluationResult"></div>
+            </div>
+
+            <!-- Reference Section -->
+            <div class="result-section">
+                <div class="section-header">
+                    <div class="section-dot"></div>
+                    <span class="section-title">Textbook Reference (Context)</span>
+                </div>
+                <div class="content-box" id="referenceContext" style="font-size: 0.9rem; opacity: 0.8;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let assignmentsData = [];
+
+        async function fetchAssignments() {
+            try {
+                const response = await fetch('/list_assignments');
+                assignmentsData = await response.json();
+                const select = document.getElementById("saved_assignment");
+
+                assignmentsData.forEach(asn => {
+                    const option = document.createElement("option");
+                    option.value = asn.id;
+                    option.textContent = `${asn.assignment_title} (${asn.subject})`;
+                    select.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error fetching assignments:", err);
+            }
+        }
+
+        function onAssignmentSelect() {
+            const assignmentId = document.getElementById("saved_assignment").value;
+            const subjectInput = document.getElementById("subject");
+            const questionsPreview = document.getElementById("questions_preview");
+            const manualGroup = document.getElementById("manual_question_group");
+
+            if (!assignmentId) {
+                questionsPreview.innerHTML = '';
+                manualGroup.style.display = 'block';
+                return;
+            }
+
+            const assignment = assignmentsData.find(a => a.id === assignmentId);
+            if (assignment) {
+                // Populate input fields
+                document.getElementById('academic_year').value = assignment.academic_year;
+                document.getElementById('class_section').value = assignment.class_section;
+                document.getElementById('assignment_title').value = assignment.assignment_title;
+                document.getElementById('chapter').value = Array.isArray(assignment.chapter) ? assignment.chapter.join(', ') : assignment.chapter;
+                document.getElementById('assignment_topic').value = Array.isArray(assignment.topic) ? assignment.topic.join(', ') : assignment.topic;
+                document.getElementById('submission_date').value = assignment.submission_date;
+                document.getElementById('is_active').checked = assignment.is_active;
+
+                // Pre-fill subject with collection name so RAG knows where to look
+                subjectInput.value = assignment.collection_name;
+
+                // Handle backward compatibility for assignments with individual marks
+                if (assignment.total_marks === undefined && assignment.marks) {
+                    assignment.total_marks = assignment.marks.reduce((a, b) => Number(a) + Number(b), 0);
+                }
+
+                // Show Questions Preview
+                questionsPreview.innerHTML = `
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; background: rgba(129, 140, 248, 0.1); padding: 0.8rem 1rem; border-radius: 0.75rem;">
+                        <span style="font-weight: 700; color: var(--primary);">TOTAL ASSIGNMENT MARKS:</span>
+                        <b style="font-size: 1.2rem;">${assignment.total_marks}M</b>
+                    </div>
+                    <label>Descriptions to Evaluate:</label>
+                `;
+                assignment.questions.forEach((q, index) => {
+                    questionsPreview.innerHTML += `
+                        <div class="question-badge-item">
+                            <span>D${index + 1}: ${q.substring(0, 70)}${q.length > 70 ? '...' : ''}</span>
+                        </div>
+                    `;
+                });
+
+                // Hide manual input when assignment is loaded
+                document.getElementById("manual_question_group").style.display = 'none';
+            }
+        }
+
+
+        window.addEventListener('load', () => {
+            fetchAssignments();
+        });
+
+        let scoreChart = null;
+
+        function updateChart(score, max = 10) {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+
+            if (scoreChart) {
+                scoreChart.destroy();
+            }
+
+            scoreChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Score', 'Remaining'],
+                    datasets: [{
+                        data: [score, max - score],
+                        backgroundColor: ['#818cf8', 'rgba(255, 255, 255, 0.05)'],
+                        borderWidth: 0,
+                        circumference: 180,
+                        rotation: 270,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '85%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                },
+                plugins: [{
+                    id: 'textCenter',
+                    afterDraw: function (chart) {
+                        const width = chart.width,
+                            height = chart.height,
+                            ctx = chart.ctx;
+                        ctx.restore();
+                        ctx.font = "bold 2.5rem 'Outfit', sans-serif";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#f3f4f6";
+                        const text = score + "/" + max,
+                            textX = Math.round((width - ctx.measureText(text).width) / 2),
+                            textY = height - (height * 0.15);
+                        ctx.fillText(text, textX, textY);
+                        ctx.save();
+                    }
+                }]
+            });
+        }
+
+        document.getElementById('evaluateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const subject = document.getElementById("subject").value;
+            if (!subject) {
+                alert("Please select or enter a subject!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("subject", subject);
+            formData.append("instructions", document.getElementById("instructions").value);
+
+            const assignmentId = document.getElementById("saved_assignment").value;
+            const assignment = assignmentsData.find(a => a.id === assignmentId);
+
+            if (assignment) {
+                assignment.questions.forEach(q => formData.append("questions", q));
+                formData.append("total_marks", assignment.total_marks);
+            } else {
+                // Manual single question
+                const qText = document.getElementById("question_text").value;
+                if (!qText) {
+                    alert("Please provide a question!");
+                    return;
+                }
+                formData.append("questions", qText);
+                formData.append("total_marks", document.getElementById("manual_total_marks").value);
+            }
+
+            // Collect files in order
+            const fileInputs = document.querySelectorAll('input[name="files"]');
+            let filesAdded = 0;
+            fileInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    formData.append("files", input.files[0]);
+                    filesAdded++;
+                }
+            });
+
+            if (filesAdded === 0) {
+                alert("Please upload at least one image!");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const resultArea = document.getElementById('resultArea');
+            const extractedText = document.getElementById('extractedText');
+            const evaluationResult = document.getElementById('evaluationResult');
+
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            try {
+                const response = await fetch('/evaluate', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                // Update Results Panel
+                extractedText.textContent = result.extracted_text;
+
+                // Clear and build Summary Table
+                evaluationResult.innerHTML = `
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Assignment Summary</h3>
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Score</th>
+                                    <th>Max</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${result.results.map((r, i) => `
+                                    <tr>
+                                        <td>Q${i + 1}</td>
+                                        <td>${r.score}</td>
+                                        <td>${Number(r.max).toFixed(1)}</td>
+                                    </tr>
+                                `).join('')}
+                                <tr style="background: rgba(129, 140, 248, 0.05); font-weight: 700;">
+                                    <td>TOTAL</td>
+                                    <td style="color: var(--primary);">${result.total_score}</td>
+                                    <td>${result.total_max}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem;">Question-wise Feedback</h3>
+                    ${result.results.map((r, i) => `
+                        <div class="feedback-item">
+                            <div class="feedback-q-header">
+                                <span class="feedback-q-title">Question ${i + 1}</span>
+                                <span class="feedback-q-score">${r.score} / ${r.max}</span>
+                            </div>
+                            <div class="content-box" style="font-size: 0.95rem; opacity: 0.9;">${r.feedback}</div>
+                        </div>
+                    `).join('')}
+                `;
+
+                document.getElementById('referenceContext').textContent = result.context ? result.context.join('\n\n') : 'No reference context found.';
+                updateChart(result.total_score || 0, result.total_max || 10);
+
+                loading.style.display = 'none';
+                resultArea.style.display = 'grid';
+                submitBtn.disabled = false;
+
+                // Smooth scroll to results
+                resultArea.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Error:', error);
+                loading.innerHTML = '<div style="color: #ef4444">An error occurred. Please try again.</div>';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function addPage() {
+            const container = document.getElementById('pagesContainer');
+            const pageCount = container.children.length + 1;
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page-upload-item';
+            pageDiv.innerHTML = `
+                <span class="page-number">Page ${pageCount}</span>
+                <input type="file" name="files" accept="image/*" required>
+                <button type="button" class="remove-page" onclick="removePage(this)">×</button>
+            `;
+            container.appendChild(pageDiv);
+            updatePageNumbers();
+        }
+
+        function removePage(btn) {
+            const container = document.getElementById('pagesContainer');
+            if (container.children.length > 1) {
+                btn.parentElement.remove();
+                updatePageNumbers();
+            }
+        }
+
+        function updatePageNumbers() {
+            const container = document.getElementById('pagesContainer');
+            Array.from(container.children).forEach((child, index) => {
+                child.querySelector('.page-number').textContent = `Page ${index + 1}`;
+                const removeBtn = child.querySelector('.remove-page');
+                if (container.children.length === 1) {
+                    removeBtn.style.visibility = 'hidden';
+                } else {
+                    removeBtn.style.visibility = 'visible';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
