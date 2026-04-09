@@ -29,6 +29,23 @@ flowchart TD
     H --> L[LLM generates answer from context]
 ```
 
+## Screenshots
+
+### Upload Page — Index textbook PDFs into the vector database
+![Upload Page](screenshots/upload.png)
+
+### Create Assignment — Define questions, topics, and upload reference material
+![Assignment Page](screenshots/assignment.png)
+
+### Evaluate Answers — Upload handwritten student answer images for AI grading
+![Evaluate Page](screenshots/evaluate.png)
+
+### Query Textbook — Ask natural-language questions grounded in uploaded content
+![Query Page](screenshots/query.png)
+
+### OCR Detection — Extract text from handwritten images standalone
+![OCR Page](screenshots/ocr.png)
+
 ## Tech Stack
 
 | Component | Technology |
@@ -41,40 +58,27 @@ flowchart TD
 | PDF Parsing | pdfminer.six |
 | Frontend | HTML / CSS / JavaScript |
 
-## Setup
+## How It Works
 
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/HassanCodesIt/Assignment-Evaluation-Assistant.git
-   cd Assignment-Evaluation-Assistant
-   ```
+### 1. Indexing Textbook Content
+The teacher starts by uploading one or more PDF textbooks on the **Upload** page and selecting a subject. The application reads and extracts all text from the PDFs using `pdfminer`, splits it into smaller overlapping chunks, generates semantic embeddings with HuggingFace's `all-MiniLM-L6-v2` model, and stores them in a **ChromaDB** vector database. Each subject gets its own collection, so content from different subjects never mixes.
 
-2. **Create a virtual environment**
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate   # Windows
-   source .venv/bin/activate # Linux / Mac
-   ```
+### 2. Creating an Assignment
+On the **Create Assignment** page the teacher fills in the academic year, class/section, subject, chapter, topic, submission date, and the list of questions with their total marks. A textbook reference PDF is also uploaded and indexed into a separate per-assignment collection in ChromaDB. The assignment metadata is saved locally in `assignments.json` so it can be retrieved later during evaluation.
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### 3. Evaluating Handwritten Answers
+On the **Evaluate** page the teacher selects the subject, enters the assignment questions and total marks, and uploads photos of a student's handwritten answer sheet. The application:
+1. Passes each image through the **Qwen2.5-VL-7B** vision-language model via HuggingFace Inference API to perform OCR and extract the written text.
+2. Stitches multi-page extractions together into a single answer string.
+3. For each question, queries ChromaDB to retrieve the most relevant textbook passages.
+4. Sends the question, the student's extracted answer, and the retrieved context to the **Groq Llama 3.3 70B** LLM, which returns a numeric score and written feedback.
+5. Displays a per-question breakdown of scores and a final total, alongside the raw OCR text and the context chunks used.
 
-4. **Set up environment variables**
-   ```bash
-   copy .env.example .env   # Windows
-   cp .env.example .env     # Linux / Mac
-   ```
-   Edit `.env` and add your API keys:
-   - `HF_TOKEN` — HuggingFace API token
-   - `GROQ_API_KEY` — Groq API key
+### 4. Querying the Textbook
+The **Query** page lets the teacher ask a free-form question about any uploaded textbook. The question is embedded, the closest chunks are retrieved from ChromaDB for the chosen subject, and the LLM generates a grounded answer — similar to a RAG-powered search over the course material.
 
-5. **Run the server**
-   ```bash
-   uvicorn main:app --reload
-   ```
-   Open [http://localhost:8000](http://localhost:8000) in your browser.
+### 5. Standalone OCR
+The **OCR** page lets anyone upload one or more handwritten images and instantly extract the text without triggering a full evaluation. Useful for quickly digitising notes or verifying that OCR output is accurate before a graded run.
 
 ## Project Structure
 
