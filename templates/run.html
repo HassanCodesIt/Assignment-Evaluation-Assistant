@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Assist | Run Code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --accent: #c084fc;
+            --bg: #030712;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --code-bg: #0d1117;
+            --code-border: rgba(129, 140, 248, 0.25);
+            --success: #4ade80;
+            --error: #f87171;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(129,140,248,0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(129,140,248,0.5); }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(192, 132, 252, 0.15) 0px, transparent 50%);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 2.5rem;
+            border-radius: 2rem;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(135deg, #a5b4fc 0%, #d8b4fe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select {
+            padding: 0.5rem 0.85rem;
+            border-radius: 0.6rem;
+            border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.3);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--primary);
+        }
+
+        .code-box-wrapper {
+            position: relative;
+            border-radius: 1rem;
+            border: 1px solid var(--code-border);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .code-box-header {
+            background: rgba(0,0,0,0.5);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-bottom: 1px solid var(--code-border);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot-red    { background: #ff5f57; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green  { background: #28c840; }
+
+        .code-box-label {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+
+        #code {
+            width: 100%;
+            min-height: 280px;
+            background: var(--code-bg);
+            color: #c9d1d9;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding: 1.25rem;
+            border: none;
+            outline: none;
+            resize: vertical;
+            box-sizing: border-box;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.9rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4); }
+        button:active { transform: translateY(0); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        #clearBtn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            box-shadow: none;
+            flex: 0 0 auto;
+        }
+        #clearBtn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+
+        .output-section {
+            margin-top: 2rem;
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .output-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+        }
+
+        .output-box {
+            background: var(--code-bg);
+            border-radius: 1rem;
+            border: 1px solid var(--code-border);
+            padding: 1.25rem;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.9rem;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-word;
+            min-height: 60px;
+            color: #c9d1d9;
+        }
+
+        .output-box.has-error { border-color: rgba(248, 113, 113, 0.35); color: var(--error); }
+        .output-box.has-success { border-color: rgba(74, 222, 128, 0.25); }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.75rem;
+            vertical-align: middle;
+        }
+        .badge-ok  { background: rgba(74,222,128,0.15); color: var(--success); border: 1px solid rgba(74,222,128,0.3); }
+        .badge-err { background: rgba(248,113,113,0.15); color: var(--error);   border: 1px solid rgba(248,113,113,0.3); }
+
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .nav-links {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        a:hover { color: var(--primary); }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Code Runner</h1>
+            <p class="subtitle">Write and run code directly in your browser.</p>
+
+            <div class="toolbar">
+                <label for="language">Language</label>
+                <select id="language" name="language">
+                    <option value="python">Python</option>
+                </select>
+            </div>
+
+            <div class="code-box-wrapper">
+                <div class="code-box-header">
+                    <span class="dot dot-red"></span>
+                    <span class="dot dot-yellow"></span>
+                    <span class="dot dot-green"></span>
+                    <span class="code-box-label" id="langLabel">python</span>
+                </div>
+                <textarea id="code" spellcheck="false" placeholder="# Write your Python code here&#10;print('Hello, world!')"># Write your Python code here
+print('Hello, world!')</textarea>
+            </div>
+
+            <div class="btn-row">
+                <button id="runBtn" onclick="runCode()">
+                    <span id="btnContent">▶ Run</span>
+                </button>
+                <button id="clearBtn" onclick="clearAll()">Clear</button>
+            </div>
+
+            <div class="output-section" id="outputSection">
+                <div class="output-label">
+                    Output
+                    <span id="statusBadge"></span>
+                </div>
+                <div class="output-box" id="outputBox"></div>
+            </div>
+
+            <div class="nav-links">
+                <a href="/">Upload</a>
+                <a href="/query">Query</a>
+                <a href="/evaluate">Evaluate</a>
+                <a href="/ocr">OCR</a>
+                <a href="/assignment">Assignment</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Allow Tab key to insert spaces instead of shifting focus
+        document.getElementById('code').addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+
+        document.getElementById('language').addEventListener('change', function () {
+            document.getElementById('langLabel').textContent = this.value;
+        });
+
+        async function runCode() {
+            const code = document.getElementById('code').value.trim();
+            const language = document.getElementById('language').value;
+            const runBtn = document.getElementById('runBtn');
+            const btnContent = document.getElementById('btnContent');
+            const outputSection = document.getElementById('outputSection');
+            const outputBox = document.getElementById('outputBox');
+            const statusBadge = document.getElementById('statusBadge');
+
+            if (!code) return;
+
+            runBtn.disabled = true;
+            btnContent.innerHTML = '<span class="spinner"></span> Running…';
+            outputSection.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('code', code);
+            formData.append('language', language);
+
+            try {
+                const response = await fetch('/run_code', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                const hasError = result.returncode !== 0 || result.stderr;
+                const output = [result.stdout, result.stderr].filter(Boolean).join('\n');
+
+                outputBox.textContent = output || '(no output)';
+                outputBox.className = 'output-box ' + (hasError ? 'has-error' : 'has-success');
+                statusBadge.innerHTML = hasError
+                    ? '<span class="status-badge badge-err">Error</span>'
+                    : '<span class="status-badge badge-ok">OK</span>';
+                outputSection.style.display = 'block';
+            } catch (err) {
+                outputBox.textContent = 'Request failed: ' + err.message;
+                outputBox.className = 'output-box has-error';
+                statusBadge.innerHTML = '<span class="status-badge badge-err">Error</span>';
+                outputSection.style.display = 'block';
+            } finally {
+                runBtn.disabled = false;
+                btnContent.textContent = '▶ Run';
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('code').value = '';
+            document.getElementById('outputSection').style.display = 'none';
+        }
+
+        // Run on Ctrl+Enter / Cmd+Enter
+        document.getElementById('code').addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runCode();
+            }
+        });
+    </script>
+</body>
+
+</html>

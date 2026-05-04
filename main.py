@@ -6,6 +6,8 @@ from RAG import extraction, vectordbadd, vectordbget, llm, evaluate_answer
 from ocr import perform_ocr, get_ocr_client, stitch_text
 import os
 import json
+import subprocess
+import sys
 
 app = FastAPI()
 
@@ -225,4 +227,34 @@ async def create_assignment(
 @app.get("/list_assignments")
 def list_assignments():
     return get_assignments()
+
+
+@app.get("/run")
+def run_page():
+    return FileResponse("templates/run.html")
+
+
+@app.post("/run_code")
+def run_code(code: str = Form(...), language: str = Form("python")):
+    if language == "python":
+        cmd = [sys.executable, "-c", code]
+    else:
+        return {"stdout": "", "stderr": f"Unsupported language: {language}", "returncode": 1}
+
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
+        return {
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "returncode": result.returncode
+        }
+    except subprocess.TimeoutExpired:
+        return {"stdout": "", "stderr": "Execution timed out (10s limit).", "returncode": 1}
+    except Exception as e:
+        return {"stdout": "", "stderr": str(e), "returncode": 1}
 
